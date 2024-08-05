@@ -32,7 +32,7 @@ INSERT INTO table_name ( first_name, second_name, gender, date_of_birth, email )
 VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
 
  id  |  first_name  | last_name |       email         | gender  | date_of_birth | country | age
------+--------------+----------------+----------------------------------+---------+-
+-----+--------------+----------------+----------------------------------+---------+--------------
   1      Leo             DAS        leodas03@gmail.com     Male      2001-01-17      India     23
 
 
