@@ -1,0 +1,64 @@
+SQL COMMENTS:-
+
+\! -> cls to clear the screen
+\l -> to display the all the data base
+\d -> to display all the tables in the data base
+\dt -> to display the table
+
+CREATE DATABASE test;
+DROP DATABASE test;
+
+SELECT * FROM table_name // to display the talbe with data, the * it means select all the column
+SELECT first_name, last_name FROM table_namec // specifying the column name
+
+DROP TABLE table_name // to drop the table 
+
+
+// How to create a table with constraints:-
+CREATE TABLE table_name (
+id BIGSERIAL NOT NULL PRIMARY KEY,
+first_name VARCHAR(50) NOT NULL,
+second_name VARCHAR(50) NOT NULL,
+gender VARCHAR(50) NOT NULL,
+email VARCHAR(150) 
+country VARCHAR(50) );
+
+
+// How to insert data into the table:-
+INSERT INTO table_name ( first_name, second_name, gender, date_of_birth, email )
+VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
+
+
+/ Generate 1000 or More Rows with ( Mockaroo website ):-
+  After creating the data in that website and the want to download that and the want to open that
+  file into the vsCode and then we want to make any adjustment and in cmd shell take that file direction
+  and add that to sql shell 
+  \i C:/Users/DELL/Downloads/person.sql  // this will create a table with values
+/
+
+
+sorting our data ORDER BY keyword:-
+12345 ASC
+4321 DESC these keyword we use in conjuction with orderby
+
+SELECT * FROM person property_name; // if it was age means it will sort in 'ASCENDING'
+
+// count the data:-
+SELECT COUNT(*) FROM person WHERE age > 30;
+
+// Show the data with conditions:-
+SELECT property_name_toshow, property_name_toshow FROM table_name WHERE property_name_toconditions > conditions
+SELECT first_name, gender FROM person WHERE date_of_birth > '2024-01-04'
+SELECT first_name, gender FROM person WHERE age > 40
+
+// Add the property in existing table:-
+ALTER TABLE table_name ADD property_name property_datatype NOT NULL DEFAULT value;
+ALTER TABLE person ADD age INT NOT NULL DEFAULT 20;
+
+// Update the data:-
+UPDATE table_name SET property_name = new_data WHERE <logic>;
+UPDATE person SET age = 20 WHERE first_name LIKE 'A%'; // this will update the age for first_name starts with 'A'
+
+// AND, OR operations
+SELECT property_name_toshow FROM table_name WHERE property_name_toconditions > conditions AND (property_name_toconditions = conditions);
+SELECT first_name FROM person WHERE age > 30 AND (gender = 'Male');
