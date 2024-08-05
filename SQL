@@ -23,10 +23,17 @@ gender VARCHAR(50) NOT NULL,
 email VARCHAR(150) 
 country VARCHAR(50) );
 
+ id  |  first_name  | last_name |  email  | gender  | date_of_birth | country | age
+-----+--------------+----------------+----------------------------------+---------+-
+
 
 // How to insert data into the table:-
 INSERT INTO table_name ( first_name, second_name, gender, date_of_birth, email )
 VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
+
+ id  |  first_name  | last_name |       email         | gender  | date_of_birth | country | age
+-----+--------------+----------------+----------------------------------+---------+-
+  1      Leo             DAS        leodas03@gmail.com     Male      2001-01-17      India     23
 
 
 / Generate 1000 or More Rows with ( Mockaroo website ):-
@@ -37,11 +44,21 @@ VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
 /
 
 
-sorting our data ORDER BY keyword:-
+// sorting our data ORDER BY keyword:-
 12345 ASC
 4321 DESC these keyword we use in conjuction with orderby
+SELECT * FROM table_name ORDER BY property_name; // if it was age means it will sort default in 'ASCENDING'
+SELECT * FROM person ORDER BY age DESC; // this will show the table data in descending order
+SELECT * FROM person ORDER BY age ASC; // this will show the table data in ascending order
+SELECT * FROM person ORDER BY age DESC, country // this will sort all the age by ascending and then this will make sort descending in country whose age are same
+ id | first_name | last_name | age | country
+----+------------+-----------+-----+---------
+  3 | Mohammed   | Yaseer    |  22 | Belgium
+  1 | Riays      | M         |  23 | India
+  4 | Jithin     | George    |  25 | Korea
+  2 | Liston     | Fermi     |  25 | America
+  the same age 25 countries only sorted in descending order
 
-SELECT * FROM person property_name; // if it was age means it will sort in 'ASCENDING'
 
 // count the data:-
 SELECT COUNT(*) FROM person WHERE age > 30;
@@ -62,3 +79,4 @@ UPDATE person SET age = 20 WHERE first_name LIKE 'A%'; // this will update the a
 // AND, OR operations
 SELECT property_name_toshow FROM table_name WHERE property_name_toconditions > conditions AND (property_name_toconditions = conditions);
 SELECT first_name FROM person WHERE age > 30 AND (gender = 'Male');
+SELECT * FROM person WHERE dob > '2024-01-01' AND (city = 'New York' OR age > 30);
