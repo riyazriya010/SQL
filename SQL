@@ -1,19 +1,27 @@
 SQL COMMENTS:-
 
+// To remove the unwanted character in vs code we can use the cl tools 
+// (Get-Content "C:\path\to\your\file.sql") -replace '\$', '' | Set-Content "C:\path\to\your\file.sql"
+PS C:\Users\DELL> (Get-Content "C:/Users/DELL/Downloads/car.sql") -replace '\$', '' | Set-Content "C:/Users/DELL/Downloads/car.sql"
+
+////////////
 \! -> cls to clear the screen
 \l -> to display the all the data base
 \d -> to display all the tables in the data base
 \dt -> to display the table
 
+////////////
 CREATE DATABASE test;
 DROP DATABASE test;
 
+////////////
 SELECT * FROM table_name // to display the talbe with data, the * it means select all the column
 SELECT first_name, last_name FROM table_namec // specifying the column name
 
+////////////
 DROP TABLE table_name // to drop the table 
 
-
+////////////
 // How to create a table with constraints:-
 CREATE TABLE table_name (
 id BIGSERIAL NOT NULL PRIMARY KEY,
@@ -26,7 +34,7 @@ country VARCHAR(50) );
  id  |  first_name  | last_name |  email  | gender  | date_of_birth | country | age
 -----+--------------+----------------+----------------------------------+---------+-
 
-
+////////////
 // How to insert data into the table:-
 INSERT INTO table_name ( first_name, second_name, gender, date_of_birth, email )
 VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
@@ -35,7 +43,23 @@ VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
 -----+--------------+----------------+----------------------------------+---------+--------------+-
   1      Leo             DAS        leodas03@gmail.com     Male      2001-01-17      India     23
 
+////////////
+test=# \d person;
+                                       Table "public.person"
+    Column     |          Type          | Collation | Nullable |              Default
+---------------+------------------------+-----------+----------+------------------------------------
+ id            | bigint                 |           | not null | nextval('person_id_seq'::regclass)
+ first_name    | character varying(50)  |           | not null |
+ last_name     | character varying(50)  |           | not null |
+ email         | character varying(150) |           |          |
+ gender        | character varying(15)  |           | not null |
+ date_of_birth | date                   |           | not null |
+ country       | character varying(50)  |           | not null |
+Indexes:
+    "person_pkey" PRIMARY KEY, btree (id)
 
+
+//////////////
 / Generate 1000 or More Rows with ( Mockaroo website ):-
   After creating the data in that website and the want to download that and the want to open that
   file into the vsCode and then we want to make any adjustment and in cmd shell take that file direction
@@ -43,7 +67,16 @@ VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
   \i C:/Users/DELL/Downloads/person.sql  // this will create a table with values
 /
 
+///////////////
+// Arranging the primary key:-
+ALTER TABLE person ADD COLUMN temp_id SERIAL;
+SELECT conname FROM pg_constraint WHERE conrelid = 'person'::regclass AND contype = 'p';
+ALTER TABLE person DROP CONSTRAINT person_pkey;
+UPDATE person SET id = temp_id;
+ALTER TABLE person ADD PRIMARY KEY (id);
+ALTER TABLE person DROP COLUMN temp_id;
 
+///////////////
 // sorting our data ORDER BY keyword:-
 12345 ASC
 4321 DESC these keyword we use in conjuction with orderby
@@ -59,31 +92,204 @@ SELECT * FROM person ORDER BY age DESC, country // this will sort all the age by
   2 | Liston     | Fermi     |  25 | America
   the same age 25 countries only sorted in descending order
 
-
+/////////
 // count the data:-
 SELECT COUNT(*) FROM person WHERE age > 30;
 
+/////////////
 // Show the data with conditions:-
 SELECT property_name_toshow, property_name_toshow FROM table_name WHERE property_name_toconditions > conditions
 SELECT first_name, gender FROM person WHERE date_of_birth > '2024-01-04'
 SELECT first_name, gender FROM person WHERE age > 40
 
+///////////
 // Add the property in existing table:-
 ALTER TABLE table_name ADD property_name property_datatype NOT NULL DEFAULT value;
 ALTER TABLE person ADD age INT NOT NULL DEFAULT 20;
 
+////////////
 // Update the data:-
 UPDATE table_name SET property_name = new_data WHERE <logic>;
 UPDATE person SET age = 20 WHERE first_name LIKE 'A%'; // this will update the age for first_name starts with 'A'
 
+////////////
 // AND, OR operations
 SELECT property_name_toshow FROM table_name WHERE property_name_toconditions > conditions AND (property_name_toconditions = conditions);
 SELECT first_name FROM person WHERE age > 30 AND (gender = 'Male');
 SELECT * FROM person WHERE dob > '2024-01-01' AND (city = 'New York' OR age > 30);
 
+////////////
 // To show all the values in property once using  DISTINCT:-
 SELECT DISTINCT country FROM person ORDER BY country;
 
+////////////
 //WHERE Clause and AND:-
 //WHERE Clause is allows us to filter the data base on conditions
 SELECT * FROM person WHERE gender = 'Female'; // this will show all the Female data
+SELECT * FROM person WHERE gender = 'Male' AND country = 'Poland';
+SELECT * FROM person WHERE gender = 'Female' AND (country = 'Poland' OR country = 'China');
+SELECT * FROM person WHERE gender = 'Female' AND (country = 'Poland' OR country = 'China') AND last_name = 'Roly';
+
+////////////
+//Comparison Operator:-
+=, <=, >=, <>NOT EQUAL,
+
+////////////
+// Limit, Offset & Fetch:-
+SELECT * FROM person LIMIT 10 //  this will show only the first 10 data
+SELECT * FROM OFFSET 5 LIMIT 5 // this will skip the first 5 and show the next 5 data
+
+////////////
+// limit is not standard key word in the sql we can use Fetch
+SELECT * FROM person OFFSET 10 FETCH FIRST 5 ROW ONLY;
+
+////////////
+// IN operator:-
+SELECT * FROM person WHERE country IN ('China', 'Poland');
+
+////////////
+// BETWEEN:-
+// this is for select data from a range
+SELECT * FROM person WHERE date_of_birth BETWEEN DATE '2018-01-01' AND '2025-01-01';
+
+////////////
+// LIKE:-
+// which one of the character is having the word
+SELECT * FROM person WHERE email LIKE '%.com'
+SELECT * FROM person WHERE email LIKE '%google.%'; // the word will contain 'google.' -> WildCard
+// instead of WildCard we can use under score
+SELECT * FROM person WHERE email LIKE '--------@';
+
+SELECT * FROM person WHERE country LIKE 'P%'; // this willshow all the country name starts with 'P'
+SELECT * FROM person WHERE country ILIKE 'p%'; // ILIKE - means case sensitive
+
+////////////
+// GROUP BY:-
+// this is allow our data base to gyoup in column
+SELECT gender, COUNT(*) FROM person GROUP BY gender; // this will show how many of them having in each gender
+   gender    | count
+-------------+-------
+ Genderqueer |    16
+ Bigender    |    12
+ Genderfluid |    10
+ Male        |   470
+ Polygender  |    15
+ Non-binary  |    19
+ Female      |   434
+ Agender     |    24
+(8 rows)
+
+////////////
+// GROUP BY HAVING:-
+// this HAVING is used to make get includes value or some conditions
+SELECT gender COUNT(*) FROM person GROUP BY gender HAVING COUNT(*) > 20 ORDER BY gender;
+ gender  | count
+---------+-------
+ Agender |    24
+ Female  |   434
+ Male    |   470
+(3 rows)
+
+
+////////////
+// Calculating  MIN, MAX, AVERAGE
+SELECT MIN(price) FROM car;
+SELECT MAX(price) FROM car;
+SELECT AVG(price) FROM car;
+SELECT ROUND(AVG(price)) FROM car;
+
+SELECT make, model, MAX(price) FROM car GROUP BY make, model;
+SELECT model, MAX(price) FROM car GROUP BY make;
+
+
+////////////
+// Calculate SUM
+// SELECT ROUND(SUM(price)) FROM car;
+// SELECT make, ROUND(SUM(price)) FROM car GROUP BY make;
+
+
+////////////
+// Basics of Arithmetic operators provided by postgres:-
+test=# SELECT 10 + 2;
+ ?column?
+----------
+       12
+(1 row)
+
+test=# SELECT 10 * 8 + 2;
+ ?column?
+----------
+       82
+(1 row)
+
+
+test=# SELECT 10^2;
+ ?column?
+----------
+      100
+(1 row)
+
+////////////
+// Arithmetic Operators - Round:-
+
+SELECT id, make, model, ROUND(price), ROUND(price * .10) FROM car;  // we are giving discount for each car 10%
+
+  id  |     make      |          model          |  price   | ?column?
+------+---------------+-------------------------+----------+-----------
+    1 | Suzuki        | XL7                     | 24912.36 | 2491.2360
+    2 | Kia           | Rondo                   | 18522.90 | 1852.2900
+    3 | Volkswagen    | New Beetle              | 23740.73 | 2374.0730
+    4 | Infiniti      | M                       | 75565.24 | 7556.5240
+    5 | Volvo         | 850                     | 74297.45 | 7429.7450
+    6 | Lotus         | Evora                   | 10558.10 | 1055.8100
+
+ SELECT id, make, model, price, ROUND(price * .10, 2), ROUND(price - (price * .10), 2) FROM car;  // this is for how much we discounted from the price;
+
+////////////
+ Alias :-
+ // Giving the name to column
+
+ SELECT id, make, model, ROUND(price, 2) AS original_price, 
+ ROUND(price * .10, 2) AS discounted_price, 
+ ROUND(price - (price * .10), 2) AS deduced_amount 
+ FROM car;
+
+////////////
+ Coalesce :-
+ // if any feild is null we can give the default value while printing
+ SELECT COALESCE(email, 'Email Not Provided') FROM person;
+
+////////////
+ Nullif :-
+ // it is a fucntion it takes two arguments and it returns the first agrs if the second args != first args
+
+ SELECT 10 / 0 // this will throw exception error
+
+ SELECT COALESCE(10, NULLIF(0, 0), 0) // this will return nothing, bu we using COALESCE so it return the 0
+
+////////////
+ Timestamps & Date :-
+
+ SELECT NOW();
+               now
+----------------------------------
+ 2024-08-08 22:34:23.541353+05:30
+(1 row)
+
+///////////
+SELECT NOW()::DATE;
+    now
+------------
+ 2024-08-08
+(1 row)
+
+///////////
+SELECT NOW()::TIME;
+       now
+-----------------
+ 22:35:59.236364
+(1 row)
+
+
+////////////
+Adding & Subtracting with Date
