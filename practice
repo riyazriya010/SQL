@@ -1,0 +1,169 @@
+//////// Retrieve the names of employees working in the 'Marketing' department ?
+
+SELECT employees.first_name, employees.last_name
+FROM employees
+JOIN departments ON employees.department_id = departments.department_id
+WHERE departments.department_name = 'Marketing';
+
+////// List the first and last names of employees who have a salary greater than 80,000 ?
+
+SELECT first_name, last_name, salary
+FROM employees
+WHERE salary > 80000;
+
+//////// Show the maximum salary in each department ?
+
+SELECT departments.department_name, MAX(employees.salary) AS max_salary
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id GROUP BY departments.department_name;
+
+//////// Find the total number of employees in the company ?
+
+SELECT COUNT(*) AS total_no_of_employees FROM employees;
+
+//////// Retrieve the email addresses of employees who were hired after January 1, 2020 ?
+
+SELECT email, hire_date FROM employees WHERE hire_date > '2020-01-01';
+
+///////// List all employee names along with their corresponding department names ?
+
+SELECT employees.first_name, employees.last_name, departments.department_name
+FROM employees
+JOIN departments ON employees.department_id = departments.department_id
+GROUP BY employees.first_name, employees.last_name, departments.department_name;
+
+///////// Find the minimum salary in the 'Sales' department ?
+
+method : 1
+
+SELECT departments.department_name, employees.salary
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+WHERE departments.department_name = 'Sales'
+ORDER BY employees.salary ASC
+LIMIT 1;
+
+method : 2
+
+SELECT departments.department_name, MIN(employees.salary) AS min_salary
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+WHERE departments.department_name = 'Sales'
+GROUP BY departments.department_name;
+
+/////////// List the names of all departments along with the location where they are based ?
+
+SELECT department_name, location FROM departments;
+
+/////////// Show the average salary of employees in the 'Engineering' department ?
+
+SELECT departments.department_name, ROUND(AVG(employees.salary)) AS avg_salary_engg
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+WHERE departments.department_name = 'Engineering'
+GROUP BY departments.department_name;
+
+////////// Retrieve the names of employees whose email domain is 'company.com' ?
+
+SELECT first_name, email FROM employees WHERE email ILIKE '%COMPANY.COM%';
+
+////////// List all employees along with their department names, even if they dont belong to a department ?
+
+SELECT employees.first_name, departments.department_name
+FROM employees
+JOIN departments
+ON departments.department_id = employees.department_id
+GROUP BY employees.first_name, departments.department_name;
+
+/////////  Find the total salary expense for each department ?
+
+SELECT departments.department_name, SUM(employees.salary) salary_expenses
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+GROUP BY departments.department_name;
+
+/////////  Retrieve the names of employees who were hired before January 1, 2019, and have a salary less than 80,000 ?
+
+SELECT first_name, hire_date, salary
+FROM employees
+WHERE hire_date < '2019-01-01' AND salary < 80000;
+
+
+///////// Calculate the total number of employees in each department ?
+
+SELECT departments.department_name, COUNT(employees.employee_id) AS employee_count
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+GROUP BY departments.department_name;
+
+////////// Show the difference between the highest and lowest salaries in the 'Engineering' department ?
+
+SELECT departments.department_name, MAX(employees.salary) AS max_salary, MIN(employees.salary) AS min_salary, (MAX(employees.salary) - MIN(employees.salary)) AS salary_difference
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+WHERE departments.department_name = 'Engineering'
+GROUP BY departments.department_name;
+
+////////// List the names and job titles of employees who are managers (their title contains 'Manager') ?
+
+SELECT first_name, job_title FROM employees WHERE job_title ILIKE '%Manager%';
+
+////////// Retrieve the departments that have more than 2 employees ?
+
+SELECT departments.department_name, COUNT(employees.employee_id)
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+GROUP BY departments.department_name
+HAVING COUNT(employees.employee_id) > 2;
+
+//////////  Find the average salary for each department and sort the results by the average salary in descending order ?
+
+SELECT departments.department_name, ROUND(AVG(employees.salary), 2)
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+GROUP BY departments.department_name
+ORDER BY AVG(employees.salary) DESC;
+
+///////////  List all employees whose salary is greater than the average salary of their department ?
+
+SELECT employees.first_name, 
+       departments.department_name, 
+       employees.salary,
+       (SELECT ROUND(AVG(salary), 2)
+        FROM employees
+        WHERE employees.department_id = departments.department_id) AS dept_avg_salary
+FROM employees
+JOIN departments
+ON employees.department_id =  departments.department_id
+WHERE employees.salary > (
+    SELECT AVG(employees.salary)
+    FROM employees
+    WHERE employees.department_id = departments.department_id
+);
+
+////////// Retrieve the names of employees and their corresponding department heads ?
+
+SELECT employees.first_name AS employee_name, departments.head_of_department AS head_name
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+GROUP BY employees.first_name, departments.head_of_department;
+
+////////// Find the department with the highest total salary expense ?
+
+SELECT departments.department_name, SUM(employees.salary) AS sum_salary_exp
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id
+GROUP BY departments.department_name
+ORDER BY SUM(employees.salary) DESC
+LIMIT 1;

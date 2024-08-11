@@ -36,8 +36,8 @@ country VARCHAR(50) );
 
 ////////////
 // How to insert data into the table:-
-INSERT INTO table_name ( first_name, second_name, gender, date_of_birth, email )
-VALUES ( 'Leo', 'Das', 'MALE', date '1996-04-26', 'riyur03@gmail.com' );
+INSERT INTO table_name ( first_name, second_name, gender, date_of_birth, email, country )
+VALUES ( 'Leo', 'Das', 'MALE', DATE '1996-04-26', 'riyur03@gmail.com' );
 
  id  |  first_name  | last_name |       email         | gender  | date_of_birth | country | age
 -----+--------------+----------------+----------------------------------+---------+--------------+-
@@ -107,10 +107,6 @@ SELECT first_name, gender FROM person WHERE age > 40
 ALTER TABLE table_name ADD property_name property_datatype NOT NULL DEFAULT value;
 ALTER TABLE person ADD age INT NOT NULL DEFAULT 20;
 
-////////////
-// Update the data:-
-UPDATE table_name SET property_name = new_data WHERE <logic>;
-UPDATE person SET age = 20 WHERE first_name LIKE 'A%'; // this will update the age for first_name starts with 'A'
 
 ////////////
 // AND, OR operations
@@ -293,3 +289,277 @@ SELECT NOW()::TIME;
 
 ////////////
 Adding & Subtracting with Date
+
+// if we want to subtract year from now
+
+test=# SELECT NOW() - INTERVAL '1 YEAR';  // this will minus 1 year from now
+             ?column?
+----------------------------------
+ 2023-08-09 09:42:57.090924+05:30
+(1 row)
+
+
+test=# SELECT NOW() - INTERVAL '10 YEAR';  // this will minus 10 years from now
+             ?column?
+----------------------------------
+ 2014-08-09 09:43:56.553472+05:30
+(1 row)
+
+test=# SELECT NOW() - INTERVAL '10 MONTHS';  // this will minus 10 months from now
+             ?column?
+----------------------------------
+ 2023-10-09 10:19:32.534938+05:30
+(1 row)
+
+
+test=# SELECT NOW() - INTERVAL '1 WEEK';  // this will minus 1 week from now
+             ?column?
+----------------------------------
+ 2024-08-02 10:19:52.878098+05:30
+(1 row)
+
+
+test=# SELECT NOW() - INTERVAL '1 DAY';  // this will minus 1 day from now
+            ?column?
+---------------------------------
+ 2024-08-08 10:20:13.93154+05:30
+(1 row)
+
+
+test=# SELECT NOW() + INTERVAL '10 DAYS';  // this will add 10 days from now
+             ?column?
+----------------------------------
+ 2024-08-19 10:33:09.200632+05:30
+(1 row)
+
+// if we want only the date or time we can query like this,
+
+test=# SELECT (NOW() + INTERVAL '10 DAYS')::DATE;
+    date
+------------
+ 2024-08-19
+(1 row)
+
+
+///////////////
+Extracting Feilds :-
+
+// if we want to extract particular feild from the date like year, month, day, century
+
+test=# SELECT EXTRACT(YEAR FROM NOW());  // this will return year
+ extract
+---------
+    2024
+(1 row)
+
+
+test=# SELECT EXTRACT(MONTH FROM NOW());   // this will return month
+ extract
+---------
+       8
+(1 row)
+
+
+test=# SELECT EXTRACT(DAY FROM NOW());   // this will return day
+ extract
+---------
+       9
+(1 row)
+
+
+test=# SELECT EXTRACT(DOW FROM NOW());    // this will return week
+ extract
+---------
+       5
+(1 row)
+
+
+test=# SELECT EXTRACT(CENTURY FROM NOW());    // this will return centruy
+ extract
+---------
+      21
+(1 row)
+
+
+Age function :-
+
+// if we want to get the full details about age of that person
+
+test=# SELECT id, first_name, last_name, email, gender, date_of_birth, country, AGE(NOW(), date_of_birth) AS age FROM person;
+
+  id  |  first_name  |   last_name    |              email               |   gender    | date_of_birth |             country              |               age               
+    3 | Jeannie      | Zellner        | jzellner2@irs.gov                | Female      | 2023-09-29    | France                           | 10 mons 10 days 10:49:17.360487
+    4 | Barnabe      | Moreno         |                                  | Male        | 2023-10-21    | Cyprus                           | 9 mons 19 days 10:49:17.360487
+
+
+///////////////////
+PRIMARY KEY :-
+
+// to drop the primay key constraint from the table
+
+ALTER TABLE person DROP CONSTRAINT person_pkey;  // this will drop the primay key constraint
+
+// Adding primary key :-
+
+ALTER TABLE person ADD PRIMARY KEY (id); // before adding the primay key ensure that in that column all are unique
+
+// Unique Constraints :-
+  // this is to maintaint the unique values in the particulat column
+
+  ALTER TABLE person ADD CONSTRAINT unique_email_address UNIQUE (email);  // this will add the constraints with the constraint_name - unique_email_address
+
+  ALTER TABLE person DROP CONSTRAINT unique_email_address;  // this will drop the constraint
+
+  // Check constraint :-
+    // the check constaint add a constraint based on a boolean condition
+
+       // now the gender column only accept the 'female' OR 'Male' 
+    ALTER TABLE person ADD CONSTRAINT gender_constraint CHECK (gender = 'Male' OR gender = 'Female');
+
+
+///////////
+Delete Records :-
+
+DELETE FROM person WHERE gender = 'Female' AND country = 'Poland'
+DELETE FROM person WHERE age = 30
+
+
+////////////
+// Update the records:-
+UPDATE table_name SET property_name = new_data WHERE <logic>;
+UPDATE person SET age = 20 WHERE first_name LIKE 'A%'; // this will update the age for first_name starts with 'A'
+
+
+///////////////////
+On Conflict, Do Nothing :-
+  // this to handle the unique error
+
+   // this last command is used to not through the error, but make sure weather that feild has a constraint
+
+test=# INSERT INTO person (id, first_name, last_name, gender, date_of_birth, email, country )
+test-# VALUES (1,'Riyas', 'Das', 'MALE', DATE '1996-04-26', 'riyur03@gmail.com', 'Poland' )
+test-# ON CONFLICT (id) DO NOTHING;
+
+
+//////////// 
+Upsert :-
+  // In previous we handled the unique error but if the same user want to change the details, we want to do the Upsert
+  // updating the existing data
+
+     // in this the user going to update his email
+test=# INSERT INTO person (id, first_name, last_name, gender, date_of_birth, email, country )
+test-# VALUES (1,'Riyas', 'Leo', 'MALE', DATE '1996-04-26', 'riyur03@gmail.com', 'Poland' )
+test-# ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email,
+test-# last_name = EXCLUDED.last_name;
+
+
+///////////////
+FOREIGN KEY, JOIN, and RELATIONSHIP :-
+
+
+
+CREATE TABLE users (
+  user_id BIGSERIAL NOT NULL PRIMARY KEY,
+  full_name VARCHAR(100) NOT NULL,
+  email VARCHAR(50) NOT NULL,
+  gender VARCHAR(50) NOT NULL,
+  country VARCHAR(50) NOT NULL,
+  order_id BIGINT REFERENCES orders (order_id),
+  UNIQUE(order_id)
+);
+
+CREATE TABLE orders (
+  order_id BIGSERIAL NOT NULL PRIMARY KEY,
+  product VARCHAR(100) NOT NULL,
+  order_date DATE NOT NULL,
+  amount NUMERIC (19, 2) NOT NULL
+  quantity INT NOT NULL
+);
+
+
+INSERT INTO users (full_name, email, gender, country)
+VALUES ('Sanooj Sahadevan', 'sanooj501@gmail.com', 'Male', 'Saudi Arabia');
+
+
+
+INSERT INTO orders (product, order_date, amount, quantity)
+VALUES ('Jeans Pant', '2023-05-03', '920.87', 1);
+
+
+
+
+test1=# SELECT users.user_id, users.full_name, users.gender, orders.amount
+test1-# FROM users
+test1-# JOIN orders ON users.order_id = orders.order_id GROUP BY users.user_id, users.full_name, users.gender, orders.amount;
+
+ user_id |    full_name     | gender | amount
+---------+------------------+--------+--------
+       1 | Riyas            | Male   | 920.87
+       3 | Sanooj Sahadevan | Male   | 650.39
+
+
+
+
+
+-- Create Employees table
+CREATE TABLE employees (
+    employee_id BIGSERIAL NOT NULL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+    hire_date DATE NOT NULL,
+    job_title VARCHAR(50) NOT NULL,
+    salary DECIMAL(10, 2) NOT NULL,
+    department_id BIGINT,
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
+);
+
+-- Create Departments table
+CREATE TABLE departments (
+    department_id BIGSERIAL NOT NULL PRIMARY KEY,
+    department_name VARCHAR(50) NOT NULL,
+    head_of_department VARCHAR(100) NOT NULL,
+    location VARCHAR(100) NOT NULL,
+);
+
+
+INSERT INTO Employees (first_name, last_name, email, phone_number, hire_date, job_title, salary)
+VALUES
+('John', 'Doe', 'john.doe@company.com', '555-1234', '2020-01-15', 'Software Engineer', 80000),
+('Jane', 'Smith', 'jane.smith@company.co.in', '555-5678', '2019-03-22', 'HR Manager', 75000),
+('Alice', 'Johnson', 'alice.johnson@company.com', '555-8765', '2018-06-12', 'Engineering Manager', 95000),
+('Bob', 'Brown', 'bob.brown@company.gov', '555-4321', '2021-07-08', 'Marketing Specialist', 60000),
+('Charlie', 'Davis', 'charlie.davis@company.com', '555-6789', '2017-11-03', 'Marketing Manager', 85000),
+('Emily', 'Wilson', 'emily.wilson@company.co', '555-9876', '2022-02-10', 'Sales Associate', 50000),
+('David', 'Lee', 'david.lee@company.in', '555-5432', '2016-09-25', 'Sales Manager', 90000);
+
+
+
+-- Insert new data into Employees table
+INSERT INTO employees (first_name, last_name, email, phone_number, hire_date, job_title, salary) VALUES
+('Anna', 'Turner', 'anna.turner@company.com', '555-1122', '2021-04-05', 'Legal Advisor', 85000),
+('Brandon', 'Taylor', 'brandon.taylor@company.com', '555-3344', '2020-09-15', 'Customer Support Manager', 70000),
+('Daniel', 'Harris', 'daniel.harris@company.com', '555-5566', '2019-12-20', 'R&D Specialist', 95000),
+('Sophie', 'Miller', 'sophie.miller@company.com', '555-7788', '2018-05-25', 'Product Manager', 92000),
+('Olivia', 'Brown', 'olivia.brown@company.com', '555-9900', '2022-03-10', 'Procurement Officer', 78000);
+
+
+-- Insert new data into Employees table
+INSERT INTO employees (first_name, last_name, email, phone_number, hire_date, job_title, salary) VALUES
+('Megan', 'Scott', 'megan.scott@company.com', '555-1111', '2021-08-15', 'HR Specialist', 65000),
+('Ethan', 'Brown', 'ethan.brown@company.com', '555-2222', '2019-01-12', 'DevOps Engineer', 88000),
+('Samantha', 'Jones', 'samantha.jones@company.com', '555-3333', '2022-04-10', 'Marketing Coordinator', 58000),
+('Michael', 'White', 'michael.white@company.com', '555-4444', '2020-10-05', 'Sales Executive', 62000),
+('Rachel', 'Green', 'rachel.green@company.com', '555-5555', '2018-09-23', 'Financial Analyst', 73000),
+('William', 'King', 'william.king@company.com', '555-6666', '2021-02-01', 'Junior Software Engineer', 72000),
+('Jessica', 'Taylor', 'jessica.taylor@company.com', '555-7777', '2019-06-18', 'Sales Representative', 61000),
+('Joshua', 'Robinson', 'joshua.robinson@company.com', '555-8888', '2022-11-01', 'HR Coordinator', 57000),
+('Sophia', 'Walker', 'sophia.walker@company.com', '555-9999', '2017-03-30', 'Marketing Strategist', 78000),
+('Andrew', 'Moore', 'andrew.moore@company.com', '555-1010', '2020-07-25', 'Accountant', 69000);
+
+
+
+INSERT INTO employees (first_name, last_name, email, phone_number, hire_date, job_title, salary)
+VALUES
+('Liston', 'Fermi', 'liston234@email.gov', '555-1247', '1997-04-15', 'Designer', 63000),
