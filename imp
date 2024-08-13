@@ -1,0 +1,98 @@
+
+////////// composite key:
+
+The combination of these two columns "PRIMARY KEY (StudentID, CourseID)" must be unique, 
+ensuring that each student can enroll in a specific course only once.
+
+CREATE TABLE CourseEnrollments (
+    StudentID INT,
+    CourseID INT,
+    EnrollmentDate DATE,
+    PRIMARY KEY (StudentID, CourseID)
+);
+
+
+///////// Candidate Key: 
+A set of one or more columns that can uniquely identify each row in a table.
+
+EmployeeID: Each EmployeeID is unique and can be used to identify each row.
+SSN: Each SSN is unique and can also be used to identify each row.
+Email: Each Email is unique and can be used to identify each row.
+
+///////// To find employees who were in Employees_2023 but are not in Employees_2024:
+
+MINUS
+
+SELECT EmployeeID, Name
+FROM Employees_2023
+MINUS
+SELECT EmployeeID, Name
+FROM Employees_2024;
+
+////////// To find employees who are present in both Employees_2023 and Employees_2024:
+
+INTERSECT
+
+SELECT EmployeeID, Name
+FROM Employees_2023
+INTERSECT
+SELECT EmployeeID, Name
+FROM Employees_2024;
+
+
+/////////// stored procedure
+
+CREATE PROCEDURE add_employee(
+    p_employee_id INT,
+    p_name TEXT,
+    p_department TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO employees (employee_id, name, department)
+    VALUES (p_employee_id, p_name, p_department);
+END;
+$$;
+
+CALL add_employee(3, 'Charlie', 'Finance');
+
+
+///////// corrolated sub query
+
+Find employees who work in the same department as Alice ?
+
+SELECT Name
+FROM Employees e1
+WHERE EXISTS (
+    SELECT 1
+    FROM Employees e2
+    WHERE e1.DepartmentID = e2.DepartmentID
+      AND e2.Name = 'Alice'
+);
+
+
+CREATE TABLE courses (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    course_name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE student (
+id BIGSERIAL NOT NULL PRIMARY KEY,
+name VARCHAR(50) NOT NULL,
+age INT NOT NULL,
+course_id INT,
+FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+
+
+//////////// ALTER functions :-
+
+ALTER TABLE table_name ADD COLUMN new_column_name data_type;
+ALTER TABLE table_name DROP COLUMN column_name;
+ALTER TABLE table_name ALTER COLUMN column_name TYPE new_data_type;
+ALTER TABLE table_name RENAME COLUMN old_column_name TO new_column_name;
+ALTER DATABASE old_database_name RENAME TO new_database_name;
+
+ALTER TABLE table_name ADD CONSTRAINT constraint_name constraint_type (column_name);
+ALTER TABLE table_name DROP CONSTRAINT constraint_name;

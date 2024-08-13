@@ -32,12 +32,16 @@
 //     }
 //   }
   
-const uri = 'https://menscart.site/?name=Riyas ^ &place=Coimbatore';
-const encoded = encodeURI(uri)
-console.log('encoded: ',encoded);
+// const uri = 'https://menscart.site/?name=Riyas ^ &place=Coimbatore';
+// const encoded = encodeURI(uri)
+// console.log('encoded: ',encoded);
 
-try {
-  console.log(decodeURI(encoded))
-} catch (e) {
-  console.log(e)
+// try {
+//   console.log(decodeURI(encoded))
+// } catch (e) {
+//   console.log(e)
+// }
+
+if([]+[] === ''){
+  console.log(true)
 }

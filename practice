@@ -167,3 +167,29 @@ ON employees.department_id = departments.department_id
 GROUP BY departments.department_name
 ORDER BY SUM(employees.salary) DESC
 LIMIT 1;
+
+
+///// find the second heighest salary ?
+
+SELECT MAX(salary) AS third_max FROM employees
+WHERE salary < (SELECT MAX(salary) FROM employees);
+
+
+////// using Common Table Expression (CTE) find the average salary greater that 75000 ?
+
+WITH averageSalaries AS (
+SELECT department_id, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department_id 
+)
+SELECT department_id, avg_salary
+FROM averageSalaries
+WHERE avg_salary > 75000;
+
+///////// create a view ?
+
+CREATE VIEW employees_dept AS
+SELECT employees.first_name, departments.department_name
+FROM employees
+JOIN departments
+ON employees.department_id = departments.department_id;
